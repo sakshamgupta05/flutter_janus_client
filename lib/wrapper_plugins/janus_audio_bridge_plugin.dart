@@ -197,6 +197,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[record] : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
   ///[filename] : basename of the file to record to, -audio.mjr will be added by the plugin<br>
   ///[group] : new group to assign to this participant, if enabled in the room (for forwarding purposes)<br>
+  ///[iceRestart] To restart ICE on an active connection, set this to true. This will cause the returned offer to have different credentials than those already in place (default: false).
   ///[offer]: provide your own webrtc offer by default sends with audiosendrecv only
   Future<void> configure(
       {bool? muted,
@@ -209,6 +210,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       bool? record,
       String? filename,
       String? group,
+      bool iceRestart: false,
       RTCSessionDescription? offer}) async {
     var payload = {
       "request": "configure",
@@ -225,7 +227,11 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
       offer = await this.createOffer(
-          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+          videoSend: false,
+          videoRecv: false,
+          audioSend: true,
+          audioRecv: true,
+          iceRestart: iceRestart);
     }
     JanusEvent response =
         JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
