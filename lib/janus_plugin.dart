@@ -654,11 +654,13 @@ class JanusPlugin {
 
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object
   /// It supports both style of offer creation that is plan-b and unified.
+  /// [iceRestart] To restart ICE on an active connection, set this to true. This will cause the returned offer to have different credentials than those already in place (default: false).
   Future<RTCSessionDescription> createOffer(
       {bool audioRecv: true,
       bool videoRecv: true,
       bool audioSend: true,
-      bool videoSend: true}) async {
+      bool videoSend: true,
+      bool iceRestart: false}) async {
     dynamic offerOptions;
     if (_context._isUnifiedPlan && !_context._usePlanB) {
       await _prepareTranscievers(
@@ -668,7 +670,8 @@ class JanusPlugin {
           videoSend: videoSend);
       offerOptions = {
         "offerToReceiveAudio": audioRecv,
-        "offerToReceiveVideo": videoRecv
+        "offerToReceiveVideo": videoRecv,
+        "iceRestart": iceRestart,
       };
     }
     RTCSessionDescription offer =
